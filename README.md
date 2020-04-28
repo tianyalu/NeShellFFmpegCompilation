@@ -2,7 +2,7 @@
 
 [TOC]
 
-## 支持流媒体播放的FFmpeg编译参考这里：[Linux环境下FFmpeg编译with libRTMP]()
+## 支持流媒体播放的FFmpeg编译参考这里：[Linux环境下FFmpeg编译with libRTMP](https://github.com/tianyalu/NeShellFFmpegCompilation/blob/master/FFmpeg_with_rtmp.md)
 
 ## 一、概念
 
