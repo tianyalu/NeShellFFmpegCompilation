@@ -1,26 +1,99 @@
 # NeShellFFmpegCompilation Shell之脚本编写与执行编译ffmpeg库
 
+[TOC]
+
+## 支持流媒体播放的FFmpeg编译参考这里：[Linux环境下FFmpeg编译with libRTMP]()
+
 ## 一、概念
-### 1.1 FFmpeg
-> FFmpge是一套开源免费跨平台的多媒体框架。它提供了录制、转换以及流化音视频的完整解决方案。
-> FFmpeg是一套可以用来记录、转换数字音频、视频，并能将其转化为流的开源计算机程序。  
-> FFmpge是一个多媒体视频处理工具，具有非常强大的功能，包括：视频采集功能、视频格式转换、视频抓图、给视频加水印等。  
+
+### 1.1 FFmpeg简介
+
+FFmpeg是一套开源免费跨平台的多媒体框架，它既是一款音视频编解码工具，同时也是一组音视频编解码开发套件，作为编解码开发套件，它可以为我们提供丰富的音视频处理的调用接口，提供了录制、转换以及流化音视频的完整解决方案。
+
+FFmpeg是一套可以用来记录、转换数字音频、视频，并能将其转化为流的开源计算机程序。它提供了媒体格式的封装与解封装，包括音视频编码、多种协议的流媒体、彩色格式转换、采样率转换、码率转换等。
+
+FFmpeg是一个多媒体视频处理工具，具有非常强大的功能，包括：视频采集功能、视频格式转换、视频抓图、给视频加水印等。
+
+FFmpeg框架提供了多种丰富的插件模块，包括封装与解封装的插件、编码与解码的插件等。
+
+> FFmpeg中的“FF”指的是“Fast Forward”，"mpeg"指的是一种压缩率比较大的活动图像和声音的压缩标准。
 
 
 ### 1.2 FFmpeg组成
-#### 1.2.1 FFmpeg工具(已经编译好的)
-* FFmpeg
-* FFplay
-* FFprobe    
+#### 1.2.1 命令行工具
+* ffmpeg: 包含FFmpeg的各种功能，如gif、格式转换、截图、编解码等  
+* ffmpeg-all: 包含FFmpeg工具及FFmpeg组件  
+* ffplay: 一个使用了FFmpeg和SDL库的简单可移植的媒体播放器  
+* ffplay-all: 包含ffplay工具及FFmpeg组件  
+* ffprobe: 用来查看多媒体文件的信息  
+* ffprobe-all: 包含ffprobe工具及FFmpeg组件  
+* ffserver: 与流媒体服务器相关，负责响应客户端的流媒体请求，吧流媒体数据发送给客户端  
+* ffserver-all: 包含ffserver工具及FFmpeg组件
 
-#### 1.2.2 FFmpeg开发库
-* Libavcodec：包含音视频编解码库  
-* Libavutil：包含简化编写程序的库（随机数字产生器、数据结构、核心多媒体应用程序）   
-* Libavformat：包含多媒体容器的格式（复用器、解复用器） 
-* Libavdevice：包含输入、输出的设备，用于多媒体输入输出的实现  
-* Libavfilter：包含多媒体过滤器的库  
-* Libswscale：执行高度图像缩放和色彩空间、像素格式的转换操作  
-* Libswresample：执行高度优化的音视频重采样工具，重新矩阵化和样本格式转换工作    
+#### 1.2.2 组件
+* Utilities: libavutil提供的通用的features及工具  
+* Video scaling and pixel format converter: 视频缩放和像素格式转换器  
+* Audio resampler: 音频重新采用  
+* Encoder and decoders(codecs): 编码和解码  
+* Bitstream filters: 码流过滤器  
+* Muxers and demuxers(formats): 数据合成及数据分离  
+* Protocols: 协议  
+* Input and output devices: 输入和输出设备  
+* Filters: 过滤器  
+
+#### 1.2.3 类库
+* Libavutil：包含一些公共的工具函数使用库（包括算术运算、字符操作、随机数字产生器、数据结构、核心多媒体应用程序）  
+* Libswscale：执行高度图像缩放和色彩空间、像素格式的转换操作，如RGB565、RGB888等于YUV420等之间的转换  
+* Libswresample：执行高度优化的音视频重采样工具，重新矩阵化和样本格式转换工作 
+* Libavcodec：包含音视频编解码库，用于各种类型声音/图像编解码。该库是音视频编解码核心库，实现了市面上可见的绝大部分编解码器的功能  
+* Libavformat：用于各种音视频封装格式的生成和解析，包括获取解码所需信息以生成解码上下文结果和读取音视频帧等功能。音视频的格式解析协议，为libavcodec分享码流提供度量的音频或视频码流源  
+* Libavdevice：硬件采集、加速、显示，包含输入、输出的设备，用于多媒体输入输出的实现。操作计算机中常见的音视频捕获或输出设备有ALSA、AUDIO_BEOS、JACK、OSS、1394、VFW等 
+* Libavfilter：包含多媒体过滤器的库，filter(FileIO、FPS、DrawText)音视频滤波器的开发，如宽高比、裁剪、格式化、非格式化、伸缩等  
+* Libavresample: 音视频封装编解码格式预设等  
+* Libpostproc: (同步、时间计算的简单算法)用于后期效果处理，音视频应用的后处理，如图像的去块效应
+#### 1.2.1 FFmpeg工具(已经编译好的)
+
+* ffmpeg（编解码工具）
+
+  ffmpeg 是FFmpeg源码编译后生成的可执行程序，可以作为命令行工具来使用。
+
+  > 例如：`./ffmpeg -i input.mp4 output.avi`
+  >
+  > 这是一条简单的ffmpeg命令，通过`-i`参数将`input.mp4`作为输入源，然后进行转码和转封装操作，输出到`output.avi`中。
+  >
+  > 上面指令也可以写成：`./ffmpeg -i input.mp4 -f avi output.dat`
+  >
+  > `-f`参数指定了输出文件的容器格式，输出的文件`output.dat`同样是`avi`格式文件（不要光看文件后缀名就断定文件封装格式）。
+
+  ffmpeg 大致处理流程：
+
+  ​	① 读取输入源
+
+  ​	② 解封装
+
+  ​	③ 解码
+
+  ​	④ 重新编码
+
+  ​	⑤ 重新封装
+
+  ​	⑥ 输出目标文件
+
+  
+
+* ffplay（播放器）
+
+  ffplay也是FFmpeg源码编译生成的一个可执行程序，通常作为测试工具来使用。ffplay提供了音视频显示和播放相关的图像信息，音频的波形信息等。
+
+  > 播放`input.mp4`文件：`./ffplay input.mp4`  
+
+  
+
+* ffprobe（多媒体分析工具）    
+
+  ffplay也是FFmpeg源码编译生成的一个可执行程序，可以从媒体文件或媒体流中获取详细的媒体信息，如音视频的编码格式、媒体容器的参数信息等。
+
+  > 查看`input.mp4`中流的信息：`./ffprobe -show_streams input.mp4`
 
 ### 1.3 如何使用FFmpeg
 > FFmpeg是由c代码编写而成，功能多，代码量大  
@@ -50,17 +123,17 @@ export PATH=$NDKROOT:$PATH 		# 添加到环境变量中
 * 使配置生效  
 ```bash
 source /etc/profile
-```  
+```
 * 测试配置是否成功
 ```bash
 ndk-build
-```  
+```
 若打印以下信息则表示配置成功：  
 ```bash
 Android NDK: Could not find application project directory !    
 Android NDK: Please define the NDK_PROJECT_PATH variable to point to it.    
 /Users/tian/NeCloud/NDKWorkspace/linuxdir/NDK/android-ndk-r17c/build/core/build-local.mk:151: *** Android NDK: Aborting    .  Stop.
-```  
+```
 
 #### 2.1.3 下载FFmpeg
 从[http://www.ffmpeg.org/download.html](http://www.ffmpeg.org/download.html)下载FFmpeg 4.0.5 版本，并解压。  
@@ -90,7 +163,7 @@ SLIB_INSTALL_LINKS='$(SLIBNAME)'
 在FFmpeg目录中，编写build.sh脚本  
 ```bash 
 vim build.sh
-``` 
+```
 脚本内容如下：  
 ```bash
 #!/bin/bash
@@ -167,7 +240,7 @@ SLIB_INSTALL_LINKS='$(SLIBNAME)'
 ```bash
 cd ffmpeg-4.0.5 
 vim buildmac.sh
-``` 
+```
 脚本内容如下：   
 ```bash
 #!/bin/bash
@@ -258,6 +331,7 @@ ffmpeg 30:20: fatal error: stdlib.h: No such file or directory  #include <stdlib
 ```
 **解决方案**  
 参考[FFmpeg编译报错[libavfilter/aeval.o] Error 1](https://www.jianshu.com/p/e8c6c634bcf5),文中提到：  
+
 > 后来发现是因为新版本的NDK引起的，因为NDK将头文件和库文件进行了分离，指定的sysroot只有库文件，头文件放在NDK目录下的sysroot中，只需要在--extra-cflags中添加“-isysroot$NDK/sysroot"即可，  
 > 还有有关汇编的头文件也进行了分离，需要根据目标平台进行指定”-I$NDK/sysroot/usr/inclued/arm-linux-androideabi",将“arm-linux-androideabi"改成需要的平台就可以，终于可以顺利地进行编译了。  
 
