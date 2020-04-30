@@ -145,7 +145,7 @@ libavcodec.a  libavfilter.a  libavformat.a  libavutil.a  libffmpeg.so  libswresa
 
 ### 3.1 下载librtmp
 
-下载 [rtmpdump](http://rtmpdump.mplayerhq.hu/download/) （rtmpdump-2.3-android.zip）
+下载 [rtmpdump](http://rtmpdump.mplayerhq.hu/download/) （rtmpdump-2.3.tgz）
 
 ```bash
 wget http://rtmpdump.mplayerhq.hu/download/rtmpdump-2.3.tgz
