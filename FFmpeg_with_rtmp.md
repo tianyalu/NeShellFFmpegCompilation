@@ -145,7 +145,7 @@ libavcodec.a  libavfilter.a  libavformat.a  libavutil.a  libffmpeg.so  libswresa
 
 ### 3.1 下载librtmp
 
-下载 [rempdump](http://rtmpdump.mplayerhq.hu/download/) （rtmpdump-2.3-android.zip）
+下载 [rtmpdump](http://rtmpdump.mplayerhq.hu/download/) （rtmpdump-2.3-android.zip）
 
 ```bash
 wget http://rtmpdump.mplayerhq.hu/download/rtmpdump-2.3.tgz
@@ -223,7 +223,7 @@ NDK_ROOT=/root/software/android-ndk-r17c
 CPU=arm-linux-androideabi
 
 #TOOLCHAIN 变量指向ndk中的交叉编译gcc所在的目录
-TOOLCHAIN=$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
+TOOLCHAIN=$NDK_ROOT/toolchains/$CPU-4.9/prebuilt/linux-x86_64
 
 #指定android api版本
 ANDROID_API=17
@@ -263,6 +263,7 @@ RTMP=/root/software/rtmpdump-2.3/install
 --enable-static \
 --sysroot=$NDK_ROOT/platforms/android-$ANDROID_API/arch-arm \
 --extra-cflags="-isysroot $NDK_ROOT/sysroot -isystem $NDK_ROOT/sysroot/usr/include/arm-linux-androideabi -D__ANDROID_API__=$ANDROID_API -U_FILE_OFFSET_BITS  -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fPIC" \
+--extra-ldflags="-L$RTMP/lib" \
 --extra-libs="-lrtmp" \
 --arch=arm \
 --target-os=android
@@ -292,6 +293,24 @@ chmod +x build_ffmpeg_with_librtmp.sh
 
 可以通过Xshell的Xftp将压缩文件传回到windows。
 
-## 5. 使用
+## 5. 使用及问题
 
-参考：[https://github.com/tianyalu/NeFFmpegPlayer](https://github.com/tianyalu/NeFFmpegPlayer)
+在使用的过程中发现报如下错误：  
+
+```bash
+libavformat/librtmp.c:254: error: undefined reference to 'RTMP_Close'
+```
+
+后来发现librtmp生成的文件也是要引入项目中的，即第三步中，生成的`librtmp.a` 也需要引入项目，接3.3： 
+
+```bash
+[root@iZwz9ci7skvj0jj2sfdmqgZ rtmpdump-2.3]# cd install
+[root@iZwz9ci7skvj0jj2sfdmqgZ install]# ls
+bin  include  lib  man  sbin
+[root@iZwz9ci7skvj0jj2sfdmqgZ install]# cd lib
+[root@iZwz9ci7skvj0jj2sfdmqgZ lib]# ls
+librtmp.a  pkgconfig
+```
+
+**使用时可参考：** [https://github.com/tianyalu/NeFFmpegPlayer](https://github.com/tianyalu/NeFFmpegPlayer)
+
