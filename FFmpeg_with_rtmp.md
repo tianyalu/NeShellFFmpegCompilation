@@ -310,7 +310,13 @@ bin  include  lib  man  sbin
 [root@iZwz9ci7skvj0jj2sfdmqgZ install]# cd lib
 [root@iZwz9ci7skvj0jj2sfdmqgZ lib]# ls
 librtmp.a  pkgconfig
+[root@iZwz9ci7skvj0jj2sfdmqgZ lib]# zip librtmp.zip librtmp.a 
+  adding: librtmp.a (deflated 55%)
+[root@iZwz9ci7skvj0jj2sfdmqgZ lib]# ls
+librtmp.a  librtmp.zip  pkgconfig
 ```
+
+可以通过`Xshell`的`Xftp`将`librtmp.zip`发送到`Windows`环境。
 
 **使用时可参考：** [https://github.com/tianyalu/NeFFmpegPlayer](https://github.com/tianyalu/NeFFmpegPlayer)
 
